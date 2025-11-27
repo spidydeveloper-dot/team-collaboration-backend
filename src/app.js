@@ -11,12 +11,14 @@ const app = express();
 app.use(helmet());
 
 // CORS Configuration
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:3000",
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 // Rate Limiting
 const limiter = rateLimit({

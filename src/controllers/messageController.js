@@ -33,6 +33,12 @@ const sendMessage = async (req, res, next) => {
       .populate("senderId", "name email")
       .populate("teamId", "name");
 
+    // Emit to team room via Socket.IO
+    const io = req.app.get("io");
+    if (io) {
+      io.to(`team:${teamId}`).emit("new-message", populatedMessage);
+    }
+
     successResponse(res, HTTP_STATUS.CREATED, "Message sent successfully", {
       message: populatedMessage,
     });
