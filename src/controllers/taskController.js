@@ -92,6 +92,12 @@ const createTask = async (req, res, next) => {
       .populate("projectId", "name")
       .populate("assignedTo", "name email");
 
+    // Emit task creation to team room
+    const io = req.app.get("io");
+    if (io) {
+      io.to(`team:${project.teamId}`).emit("task-updated", populatedTask);
+    }
+
     successResponse(res, HTTP_STATUS.CREATED, "Task created successfully", {
       task: populatedTask,
     });
@@ -138,6 +144,12 @@ const updateTask = async (req, res, next) => {
     })
       .populate("projectId", "name")
       .populate("assignedTo", "name email");
+
+    // Emit task update to team room
+    const io = req.app.get("io");
+    if (io) {
+      io.to(`team:${project.teamId}`).emit("task-updated", task);
+    }
 
     successResponse(res, HTTP_STATUS.OK, "Task updated successfully", { task });
   } catch (error) {
